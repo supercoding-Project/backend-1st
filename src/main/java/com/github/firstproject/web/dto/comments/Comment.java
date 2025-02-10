@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Comments {
+public class Comment {
     private String content;
     private String author;
     private Integer postId;
