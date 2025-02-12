@@ -11,5 +11,5 @@ import java.util.Optional;
 @Repository
 public interface LikesRepository extends JpaRepository<LikesEntity, Integer> {
 
-    Optional<LikesEntity> findByUserEntityAndComment_id(UserEntity userEntity, Integer comment_id);
+        Optional<LikesEntity> findByUserEntityAndComment_id(UserEntity userEntity, Integer commentId);
 }
