@@ -8,12 +8,16 @@ import com.github.firstproject.post.dto.PostDto;
 import com.github.firstproject.post.entity.PostEntity;
 import com.github.firstproject.post.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -26,9 +30,8 @@ public class PostService {
 
 
     @Transactional
-    public void postWrite(PostDto postDto) {
-        UserEntity userEntity = userRepository.findById(postDto.getAuthor())
-                .orElseThrow(()-> new AppException(ErrorCode.BINDING_RESULT_ERROR,"아이디가 유효하지않습니다."));
+    public void postWrite(PostDto postDto, int userId) {
+        UserEntity userEntity = findUserById(userId);
 
         PostEntity postEntity = PostEntity.builder()
                 .title(postDto.getTitle())
@@ -41,28 +44,93 @@ public class PostService {
     }
 
     @Transactional
-    public ResponseEntity<?> getDetailPost(Long postId) {
-        Optional<PostEntity> postEntity = postRepository.findById(postId);
-
-        if(postEntity.isPresent()) {
-           // throw new AppException();
-            //errorcode 추가필요
+    public void postUpdate(PostDto postDto, int userId) {
+        PostEntity postEntity = findPostById((postDto.getPostId()));
+        UserEntity userEntity = findUserById(userId);
+        // 수정하는 사람이 작성자와 일치한지 확인 필요
+        if(userEntity.getUserId().equals(postEntity.getUserEntity().getUserId())) {
+            throw new AppException(ErrorCode.NOT_EQUAL_POST_USER,ErrorCode.NOT_EQUAL_POST_USER.getMessage());
         }
+        postEntity.setPostEntity(postDto);
+    }
 
-//        UserEntity userEntity = userRepository.findById(postEntity.get().getUserEntity().getUserId())
-//                .orElseThrow(()-> new AppException(ErrorCode.BINDING_RESULT_ERROR,"아이디가 유효하지않습니다."));
+    @Transactional
+    public void postDelete(Long postId, int userId) {
+        PostEntity postEntity = findPostById((postId));
+        UserEntity userEntity = findUserById(userId);
+        // 삭제하는 사람이 작성자와 일치한지 확인 필요
+        if(userEntity.getUserId().equals(postEntity.getUserEntity().getUserId())) {
+           throw new AppException(ErrorCode.NOT_EQUAL_POST_USER,ErrorCode.NOT_EQUAL_POST_USER.getMessage());
+        }
+        postRepository.delete(postEntity);
+    }
 
-        PostDto postDto = new PostDto(
-                postEntity.get().getPostId(),
-                postEntity.get().getTitle(),
-                postEntity.get().getContent(),
-                postEntity.get().getUserEntity().getUserId(),
-                postEntity.get().getUserEntity().getUsername(),
-                postEntity.get().getCreatedAt()
+    @Transactional
+    public ResponseEntity<?> getDetailPost(Long postId) {
+        PostEntity postEntity = findPostById((postId));
+        UserEntity userEntity = findUserById(postEntity.getUserEntity().getUserId());
+
+       PostDto postDto = new PostDto(
+                postEntity.getPostId(),
+                postEntity.getTitle(),
+                postEntity.getContent(),
+                userEntity.getUsername(),
+                postEntity.getCreatedAt()
         );
 
         return new ResponseEntity<>(postDto, HttpStatus.OK);
-
     }
 
+    ////////////////////////////////////////////////////////////////
+    /// 예외처리 method
+    private PostEntity findPostById(Long postId) {
+        return postRepository.findById(postId)
+                .orElseThrow(() -> new AppException(ErrorCode.CHECK_POST_ID,ErrorCode.CHECK_POST_ID.getMessage()));
+    }
+
+    private UserEntity findUserById(int userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(()-> new AppException(ErrorCode.CHECK_USER_ID,ErrorCode.CHECK_USER_ID.getMessage()));
+
+    }
+    ////////////////////////////////////////////////////////////////
+
+
+    @Transactional
+    public ResponseEntity<?> getAllPost(Pageable pageable){
+        Page<PostEntity> postEntityPage = postRepository.findAll(pageable);
+
+        List<PostDto> postDtoList = new ArrayList<>();
+        for (PostEntity postEntity : postEntityPage) {
+            PostDto postDto = new PostDto(
+                    postEntity.getPostId(),
+                    postEntity.getTitle(),
+                    postEntity.getContent(),
+                    postEntity.getUserEntity().getUsername(),
+                    postEntity.getCreatedAt()
+            );
+            postDtoList.add(postDto);
+        }
+
+        return ResponseEntity.ok(postDtoList);
+    }
+
+    @Transactional
+    public ResponseEntity<?> getSearchPost(String searchEmail,Pageable pageable){
+        Page<PostEntity> postEntityPage = postRepository.pagePostList(searchEmail,pageable);
+
+        List<PostDto> postDtoList = new ArrayList<>();
+        for (PostEntity postEntity : postEntityPage) {
+            PostDto postDto = new PostDto(
+                    postEntity.getPostId(),
+                    postEntity.getTitle(),
+                    postEntity.getContent(),
+                    postEntity.getUserEntity().getUsername(),
+                    postEntity.getCreatedAt()
+            );
+            postDtoList.add(postDto);
+        }
+
+        return ResponseEntity.ok(postDtoList);
+    }
 }

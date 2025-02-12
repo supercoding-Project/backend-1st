@@ -15,6 +15,10 @@ public enum ErrorCode {
     CHECK_EMAIL_OR_PASSWORD(HttpStatus.NOT_FOUND, "이메일 또는 비밀번호가 올바르지 않습니다."),
     NOT_EQUAL_PASSWORD(HttpStatus.BAD_REQUEST, "비밀번호가 올바르지 않습니다"),
 
+    // PostsErrorCode
+    NOT_EQUAL_POST_USER(HttpStatus.BAD_REQUEST, "게시물 수정/삭제 권한이 없습니다."),
+    CHECK_USER_ID(HttpStatus.BAD_REQUEST, "작성자 정보가 유효하지않습니다."),
+    CHECK_POST_ID(HttpStatus.BAD_REQUEST, "게시물이 유효하지않습니다.")
     ;
 
     private final HttpStatus httpStatus;

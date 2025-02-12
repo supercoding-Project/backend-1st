@@ -1,6 +1,7 @@
 package com.github.firstproject.post.entity;
 
 import com.github.firstproject.auth.entity.UserEntity;
+import com.github.firstproject.post.dto.PostDto;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -30,4 +31,9 @@ public class PostEntity {
 
     @Column(name="created_at",nullable = false)
     private LocalDateTime createdAt;  // 작성일
+
+    public void setPostEntity(PostDto postDto) {
+        this.title = postDto.getTitle();
+        this.content = postDto.getContent();
+    }
 }
