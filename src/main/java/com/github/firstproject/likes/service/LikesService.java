@@ -31,25 +31,33 @@ public class LikesService {
                 .orElseThrow(() -> new NotFoundException("댓글이 존재하지 않습니다"));
 
         // 2. 해당 회원이 이미 해당 댓글에 좋아요를 눌렀는지 확인
-        LikesEntity likesEntity = likesRepository.findByUserEntityAndComment_id(userEntity, comment_id)
-                .orElseThrow(() -> new Exception());
-        if (likesEntity != null) {
-            // 이미 좋아요가 존재하면 추가하지 않음
-            return false;
-        }
-
-        // 3. 좋아요 추가
-        LikesEntity likeEntity = new LikesEntity();
-        likeEntity.setComment(comment);
-        likesRepository.save(likeEntity);
+//        LikesEntity likesEntity = likesRepository.findByUserEntityAndComment_id(userEntity, comment_id)
+//                .orElseThrow(() -> new Exception());
+//        if (likesEntity != null) {
+//            // 이미 좋아요가 존재하면 추가하지 않음
+//            return false;
+//        }
+//
+//        // 3. 좋아요 추가
+//        LikesEntity likeEntity = new LikesEntity();
+//        likeEntity.setComment(comment);
+//        likesRepository.save(likeEntity);
+        LikesEntity likes = likesRepository.findByUserEntityAndComment(userEntity,comment)
+                .orElseGet(() -> {
+            LikesEntity likeEntity = new LikesEntity();
+            likeEntity.setComment(comment);
+            return likesRepository.save(likeEntity);
+        });
 
         return true;
     }
 
     @Transactional
     public boolean removeLike(UserEntity userEntity, Integer comment_id) {
+        Comment comment = commentRepository.findById(comment_id)
+                .orElseThrow(() -> new NotFoundException("댓글이 존재하지 않습니다"));
         // 1. 해당 회원과 댓글에 대한 좋아요 엔티티 조회
-        LikesEntity likesEntity = likesRepository.findByUserEntityAndComment_id(userEntity, comment_id)
+        LikesEntity likesEntity = likesRepository.findByUserEntityAndComment(userEntity, comment)
                 .orElseThrow(() -> new NotFoundException("해당 댓글에 좋아요가 없습니다"));
 
         // 2. 좋아요 엔티티 삭제
