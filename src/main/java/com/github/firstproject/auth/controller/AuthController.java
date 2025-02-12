@@ -51,4 +51,13 @@ public class AuthController {
         log.info("[POST]: 로그인 요청");
         return userService.login(loginDto, httpServletResponse);
     }
+
+    @PostMapping("/v1/test")
+    public ResponseEntity<?> test(@AuthenticationPrincipal CustomUserDetails customUserDetails) {
+        log.info("커스텀 유저 이메일 확인: {}",customUserDetails.getUsername());
+        log.info("커스텀 유저 비밀번호 확인: {}",customUserDetails.getPassword());
+
+        return ResponseEntity.ok(new MsgResponseDto("테스트 성공", HttpStatus.OK.value()));
+    }
+
 }
