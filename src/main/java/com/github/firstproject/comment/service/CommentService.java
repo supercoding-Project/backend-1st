@@ -1,12 +1,16 @@
 package com.github.firstproject.comment.service;
 
+import com.github.firstproject.auth.entity.UserEntity;
 import com.github.firstproject.comment.dto.CommentDto;
+import com.github.firstproject.comment.dto.CreateCommentDto;
 import com.github.firstproject.comment.entity.Comment;
 import com.github.firstproject.comment.repository.CommentRepository;
+import com.github.firstproject.global.exception.AppException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -25,5 +29,23 @@ public class CommentService {
                         .createdAt(comment.getCreatedAt())
                                 .build()).collect(Collectors.toList());
 
+    }
+    @Transactional
+    public Boolean addComment(CreateCommentDto createCommentDto, UserEntity userEntity) {
+        //save
+        Boolean isSuccess = false;
+        try {
+            commentRepository.save(
+                    Comment.builder()
+                            .content(createCommentDto.getContent())
+                            .userEntity(userEntity)
+                            .postId(createCommentDto.getPostId())
+                            .createdAt(LocalDateTime.now()).build()
+            );
+        } catch (Exception e) {
+            isSuccess = false;
+            //throw new AppException()
+        }
+        return isSuccess;
     }
 }

@@ -31,9 +31,6 @@ public class Comment {
     @Column(nullable = false)
     private Integer postId;
 
-//    @Column
-//    private Integer parentCommentId;
-
-    @Column(nullable = false)
+    @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 }
