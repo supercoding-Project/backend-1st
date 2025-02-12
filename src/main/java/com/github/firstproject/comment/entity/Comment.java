@@ -1,4 +1,4 @@
-package com.github.firstproject.likes.entity;
+package com.github.firstproject.comment.entity;
 
 import com.github.firstproject.auth.entity.UserEntity;
 import jakarta.persistence.*;
@@ -31,9 +31,6 @@ public class Comment {
     @Column(nullable = false)
     private Integer postId;
 
-//    @Column
-//    private Integer parentCommentId;
-
-    @Column(nullable = false)
+    @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 }
