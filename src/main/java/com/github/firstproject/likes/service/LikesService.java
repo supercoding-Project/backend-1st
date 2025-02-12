@@ -45,6 +45,7 @@ public class LikesService {
         LikesEntity likes = likesRepository.findByUserEntityAndComment(userEntity,comment)
                 .orElseGet(() -> {
             LikesEntity likeEntity = new LikesEntity();
+            likeEntity.setUserEntity(userEntity);
             likeEntity.setComment(comment);
             return likesRepository.save(likeEntity);
         });
