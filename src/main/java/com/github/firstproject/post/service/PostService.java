@@ -33,36 +33,51 @@ public class PostService {
     public void postWrite(PostDto postDto, int userId) {
         UserEntity userEntity = findUserById(userId);
 
-        PostEntity postEntity = PostEntity.builder()
-                .title(postDto.getTitle())
-                .content(postDto.getContent())
-                .userEntity(userEntity)
-                .createdAt(LocalDateTime.now())
-                .build();
-
-        postRepository.save(postEntity);
+        try{
+            PostEntity postEntity = PostEntity.builder()
+                    .title(postDto.getTitle())
+                    .content(postDto.getContent())
+                    .userEntity(userEntity)
+                    .createdAt(LocalDateTime.now())
+                    .build();
+            postRepository.save(postEntity);
+        }catch (Exception e){
+            throw new AppException(ErrorCode.NOT_ACCEPT,ErrorCode.NOT_ACCEPT.getMessage());
+        }
     }
 
     @Transactional
     public void postUpdate(PostDto postDto, int userId) {
         PostEntity postEntity = findPostById((postDto.getPostId()));
         UserEntity userEntity = findUserById(userId);
-        // 수정하는 사람이 작성자와 일치한지 확인 필요
-        if(userEntity.getUserId().equals(postEntity.getUserEntity().getUserId())) {
+
+        // 작성자와 사용자가 일치하지않는 경우 error
+        if(!userEntity.getUserId().equals(postEntity.getUserEntity().getUserId())) {
             throw new AppException(ErrorCode.NOT_EQUAL_POST_USER,ErrorCode.NOT_EQUAL_POST_USER.getMessage());
         }
-        postEntity.setPostEntity(postDto);
+
+        try{
+            postEntity.setPostEntity(postDto);
+        }catch (Exception e){
+            throw new AppException(ErrorCode.NOT_ACCEPT,ErrorCode.NOT_ACCEPT.getMessage());
+        }
     }
 
     @Transactional
     public void postDelete(Long postId, int userId) {
         PostEntity postEntity = findPostById((postId));
         UserEntity userEntity = findUserById(userId);
-        // 삭제하는 사람이 작성자와 일치한지 확인 필요
-        if(userEntity.getUserId().equals(postEntity.getUserEntity().getUserId())) {
-           throw new AppException(ErrorCode.NOT_EQUAL_POST_USER,ErrorCode.NOT_EQUAL_POST_USER.getMessage());
+
+        // 작성자와 사용자가 일치하지않는 경우 error
+        if(!userEntity.getUserId().equals(postEntity.getUserEntity().getUserId())) {
+            throw new AppException(ErrorCode.NOT_EQUAL_POST_USER,ErrorCode.NOT_EQUAL_POST_USER.getMessage());
         }
-        postRepository.delete(postEntity);
+
+        try{
+            postRepository.delete(postEntity);
+        }catch (Exception e){
+            throw new AppException(ErrorCode.NOT_ACCEPT,ErrorCode.NOT_ACCEPT.getMessage());
+        }
     }
 
     @Transactional
@@ -70,25 +85,30 @@ public class PostService {
         PostEntity postEntity = findPostById((postId));
         UserEntity userEntity = findUserById(postEntity.getUserEntity().getUserId());
 
-       PostDto postDto = new PostDto(
-                postEntity.getPostId(),
-                postEntity.getTitle(),
-                postEntity.getContent(),
-                userEntity.getUsername(),
-                postEntity.getCreatedAt()
-        );
-
-        return new ResponseEntity<>(postDto, HttpStatus.OK);
+        try{
+           PostDto postDto = new PostDto(
+                    postEntity.getPostId(),
+                    postEntity.getTitle(),
+                    postEntity.getContent(),
+                    userEntity.getUsername(),
+                    postEntity.getCreatedAt()
+            );
+            return new ResponseEntity<>(postDto, HttpStatus.OK);
+        }catch (Exception e){
+            throw new AppException(ErrorCode.NOT_ACCEPT,ErrorCode.NOT_ACCEPT.getMessage());
+        }
     }
 
     ////////////////////////////////////////////////////////////////
-    /// 예외처리 method
+    /// findId Entity
     private PostEntity findPostById(Long postId) {
+        // 게시판 id가 존재하지않을 경우 error
         return postRepository.findById(postId)
                 .orElseThrow(() -> new AppException(ErrorCode.CHECK_POST_ID,ErrorCode.CHECK_POST_ID.getMessage()));
     }
 
     private UserEntity findUserById(int userId) {
+        // 사용자 id가 존재하지않을 경우 error
         return userRepository.findById(userId)
                 .orElseThrow(()-> new AppException(ErrorCode.CHECK_USER_ID,ErrorCode.CHECK_USER_ID.getMessage()));
 
@@ -101,36 +121,41 @@ public class PostService {
         Page<PostEntity> postEntityPage = postRepository.findAll(pageable);
 
         List<PostDto> postDtoList = new ArrayList<>();
-        for (PostEntity postEntity : postEntityPage) {
-            PostDto postDto = new PostDto(
-                    postEntity.getPostId(),
-                    postEntity.getTitle(),
-                    postEntity.getContent(),
-                    postEntity.getUserEntity().getUsername(),
-                    postEntity.getCreatedAt()
-            );
-            postDtoList.add(postDto);
+        try{
+            for (PostEntity postEntity : postEntityPage) {
+                PostDto postDto = new PostDto(
+                        postEntity.getPostId(),
+                        postEntity.getTitle(),
+                        postEntity.getContent(),
+                        postEntity.getUserEntity().getUsername(),
+                        postEntity.getCreatedAt()
+                );
+                postDtoList.add(postDto);
+            }
+            return ResponseEntity.ok(postDtoList);
+        }catch (Exception e){
+            throw new AppException(ErrorCode.NOT_ACCEPT,ErrorCode.NOT_ACCEPT.getMessage());
         }
-
-        return ResponseEntity.ok(postDtoList);
     }
 
     @Transactional
     public ResponseEntity<?> getSearchPost(String searchEmail,Pageable pageable){
         Page<PostEntity> postEntityPage = postRepository.pagePostList(searchEmail,pageable);
-
-        List<PostDto> postDtoList = new ArrayList<>();
-        for (PostEntity postEntity : postEntityPage) {
-            PostDto postDto = new PostDto(
-                    postEntity.getPostId(),
-                    postEntity.getTitle(),
-                    postEntity.getContent(),
-                    postEntity.getUserEntity().getUsername(),
-                    postEntity.getCreatedAt()
-            );
-            postDtoList.add(postDto);
+        try{
+            List<PostDto> postDtoList = new ArrayList<>();
+            for (PostEntity postEntity : postEntityPage) {
+                PostDto postDto = new PostDto(
+                        postEntity.getPostId(),
+                        postEntity.getTitle(),
+                        postEntity.getContent(),
+                        postEntity.getUserEntity().getUsername(),
+                        postEntity.getCreatedAt()
+                );
+                postDtoList.add(postDto);
+            }
+            return ResponseEntity.ok(postDtoList);
+        }catch (Exception e){
+            throw new AppException(ErrorCode.NOT_ACCEPT,ErrorCode.NOT_ACCEPT.getMessage());
         }
-
-        return ResponseEntity.ok(postDtoList);
     }
 }
