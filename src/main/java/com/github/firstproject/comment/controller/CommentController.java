@@ -24,8 +24,7 @@ import java.util.Map;
 
 @Slf4j
 @RestController
-//@RequestMapping("/api/v1/comments")
-@RequestMapping("/api/comments")
+@RequestMapping("/api/v1/comments")
 @RequiredArgsConstructor
 public class CommentController {
     private final CommentService commentService;
@@ -41,10 +40,9 @@ public class CommentController {
     @Operation(summary = "댓글 추가")
     @PostMapping
     public ResponseEntity<Map<String,String>> addComment(
-            //@AuthenticationPrincipal CustomUserDetails customUserDetails,
+            @AuthenticationPrincipal CustomUserDetails customUserDetails,
             @RequestBody CreateCommentDto createCommentDto){
-        //UserEntity user = customUserDetails.getUserEntity();
-        UserEntity user = userRepository.findById(1).orElseThrow(RuntimeException::new);
+        UserEntity user = customUserDetails.getUserEntity();
         Boolean isOk = commentService.addComment(createCommentDto,user);
         Map<String,String> response = new HashMap<>();
         if(isOk){
@@ -65,8 +63,7 @@ public class CommentController {
             @PathVariable Integer comment_id,
             @RequestBody UpdateCommentDto updateCommentDto
             ){
-        //UserEntity user = customUserDetails.getUserEntity();
-        UserEntity user = userRepository.findById(1).orElseThrow(RuntimeException::new);
+        UserEntity user = customUserDetails.getUserEntity();
         Boolean isOk = commentService.updateComment(comment_id,updateCommentDto,user);
         Map<String,String> response = new HashMap<>();
         if(isOk){
@@ -85,8 +82,7 @@ public class CommentController {
             @Parameter(name = "comment_id", description = "댓글 ID", example = "")
             @PathVariable Integer comment_id
     ){
-        //UserEntity user = customUserDetails.getUserEntity();
-        UserEntity user = userRepository.findById(2).orElseThrow(RuntimeException::new);
+        UserEntity user = customUserDetails.getUserEntity();
         Boolean isOk = commentService.deleteComment(comment_id,user);
         Map<String,String> response = new HashMap<>();
         if(isOk){
