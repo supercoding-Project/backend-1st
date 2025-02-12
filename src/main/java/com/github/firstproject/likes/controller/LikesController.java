@@ -39,7 +39,7 @@ public class LikesController {
     @DeleteMapping("/delete_like")
     public ResponseEntity<?> deleteLike(
             @AuthenticationPrincipal CustomUserDetails customUserDetails,
-            @RequestBody @Valid LikesDto likesDto) throws Exception {
+            @RequestBody @Valid LikesDto likesDto) {
         UserEntity userEntity = customUserDetails.getUserEntity();
         log.info("[POST] 좋아요 취소");
 
