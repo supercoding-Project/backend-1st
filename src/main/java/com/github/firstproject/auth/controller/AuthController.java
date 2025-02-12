@@ -4,6 +4,7 @@ package com.github.firstproject.auth.controller;
 import com.github.firstproject.auth.dto.LoginDto;
 import com.github.firstproject.auth.dto.SignUpDto;
 import com.github.firstproject.auth.service.UserService;
+import com.github.firstproject.global.config.auth.custom.CustomUserDetails;
 import com.github.firstproject.global.dto.MsgResponseDto;
 import com.github.firstproject.global.exception.ErrorCode;
 import io.swagger.v3.oas.annotations.Operation;
@@ -13,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -47,7 +49,6 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginDto loginDto, HttpServletResponse httpServletResponse) {
         log.info("[POST]: 로그인 요청");
-
         return userService.login(loginDto, httpServletResponse);
     }
 }

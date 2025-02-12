@@ -21,7 +21,7 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 @Configuration
 @RequiredArgsConstructor
 @EnableWebSecurity
-public class SecuirityConfig {
+public class SecurityConfig {
 
     private final JwtTokenProvider jwtTokenProvider;
 
