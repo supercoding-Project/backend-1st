@@ -53,7 +53,7 @@ public class LikesController {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body("해당 댓글에 좋아요가 없습니다.");
             }
         } catch (Exception e) {
-            log.error("좋아요 취소 중 오류 발생: {}", e.getMessage(), e);  // 예외 메시지 및 스택 트레이스를 로그에 기록
+            log.error("좋아요 취소 중 오류 발생: {}", e.getMessage(), e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("서버 오류가 발생했습니다. 다시 시도해주세요.");
         }
