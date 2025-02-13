@@ -11,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.webjars.NotFoundException;
 
 @Slf4j
 @RestController
@@ -23,7 +24,7 @@ public class LikesController {
     @PostMapping("/add_like")
     public ResponseEntity<?> addLike(
             @AuthenticationPrincipal CustomUserDetails customUserDetails,
-            @RequestBody @Valid LikesDto likesDto) throws Exception {
+            @RequestBody @Valid LikesDto likesDto) throws NotFoundException {
         UserEntity userEntity = customUserDetails.getUserEntity();
         log.info("[POST] 좋아요");
 
@@ -39,7 +40,7 @@ public class LikesController {
     @DeleteMapping("/delete_like")
     public ResponseEntity<?> deleteLike(
             @AuthenticationPrincipal CustomUserDetails customUserDetails,
-            @RequestBody @Valid LikesDto likesDto) {
+            @RequestBody @Valid LikesDto likesDto) throws NotFoundException {
         UserEntity userEntity = customUserDetails.getUserEntity();
         log.info("[DELETE] 좋아요 취소");
 
