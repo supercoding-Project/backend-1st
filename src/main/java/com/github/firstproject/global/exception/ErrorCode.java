@@ -20,7 +20,7 @@ public enum ErrorCode {
     NOT_EQUAL_POST_USER(HttpStatus.BAD_REQUEST, "게시물 수정/삭제 권한이 없습니다."),
     CHECK_USER_ID(HttpStatus.NOT_FOUND, "작성자 정보가 유효하지않습니다."),
     CHECK_POST_ID(HttpStatus.NOT_FOUND, "게시물이 유효하지않습니다."),
-    NOT_ACCEPT(HttpStatus.NOT_ACCEPTABLE, "해당 페이지에 오류가 발생했습니다.")
+    NOT_ACCEPT(HttpStatus.NOT_ACCEPTABLE, "해당 페이지에 오류가 발생했습니다."),
       
     // comment error code
     NOT_ACCEPT_SAVE(HttpStatus.NOT_ACCEPTABLE,"저장이 완료 되지 않았습니다."),
