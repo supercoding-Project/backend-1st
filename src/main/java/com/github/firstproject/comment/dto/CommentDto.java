@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 public class CommentDto {
     private Integer id;
     private String content;
-    private String author; //username : 프로트에서 필요한 정보는 작성자 이름이니 username 전달
+    private String author; //username : 프론트에서 필요한 정보는 작성자 이름이니 username 전달
     private Integer postId;
     private LocalDateTime createdAt;
 }
