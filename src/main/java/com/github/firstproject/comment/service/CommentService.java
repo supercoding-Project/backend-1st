@@ -20,14 +20,18 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class CommentService {
     private final CommentRepository commentRepository;
+
     public List<CommentDto> getComments(Integer postId) {
-        List<Comment> comments = commentRepository.findByPostId(postId);
+        PostEntity post = postRepository.findById(postId.longValue())
+                .orElseThrow(()-> new AppException(ErrorCode.CHECK_POST_ID,ErrorCode.CHECK_POST_ID.getMessage()));
+        List<Comment> comments = commentRepository.findByPostEntity(post);
         return comments.stream().map(comment ->
                 CommentDto.builder()
                         .id(comment.getComment_id())
                         .content(comment.getContent())
                         .author(comment.getUserEntity().getUsername())
                         .postId(comment.getPostId())
+                        .postId(comment.getPostEntity().getPostId().intValue())
                         .createdAt(comment.getCreatedAt())
                                 .build()).collect(Collectors.toList());
 
@@ -37,16 +41,7 @@ public class CommentService {
         //save
         Boolean isSuccess = false;
         try {
-            commentRepository.save(
-                    Comment.builder()
-                            .content(createCommentDto.getContent())
                             .userEntity(userEntity)
-                            .postId(createCommentDto.getPostId())
-                            .createdAt(LocalDateTime.now()).build()
-            );
-            isSuccess = true;
-        } catch (Exception e) {
-            isSuccess = false;
             throw new AppException(ErrorCode.NOT_ACCEPT_SAVE,ErrorCode.NOT_ACCEPT_SAVE.getMessage());
         }
         return isSuccess;
