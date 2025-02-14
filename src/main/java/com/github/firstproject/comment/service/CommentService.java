@@ -8,6 +8,8 @@ import com.github.firstproject.comment.entity.Comment;
 import com.github.firstproject.comment.repository.CommentRepository;
 import com.github.firstproject.global.exception.AppException;
 import com.github.firstproject.global.exception.ErrorCode;
+import com.github.firstproject.post.entity.PostEntity;
+import com.github.firstproject.post.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,6 +22,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class CommentService {
     private final CommentRepository commentRepository;
+    private final PostRepository postRepository;
 
     public List<CommentDto> getComments(Integer postId) {
         PostEntity post = postRepository.findById(postId.longValue())
@@ -30,10 +33,9 @@ public class CommentService {
                         .id(comment.getComment_id())
                         .content(comment.getContent())
                         .author(comment.getUserEntity().getUsername())
-                        .postId(comment.getPostId())
                         .postId(comment.getPostEntity().getPostId().intValue())
                         .createdAt(comment.getCreatedAt())
-                                .build()).collect(Collectors.toList());
+                        .build()).collect(Collectors.toList());
 
     }
     @Transactional
@@ -41,7 +43,17 @@ public class CommentService {
         //save
         Boolean isSuccess = false;
         try {
+            PostEntity postEntity = postRepository.findById(createCommentDto.getPostId().longValue())
+                    .orElseThrow(() -> new AppException(ErrorCode.CHECK_POST_ID,ErrorCode.CHECK_POST_ID.getMessage()));
+            commentRepository.save(
+                    Comment.builder()
+                            .content(createCommentDto.getContent())
                             .userEntity(userEntity)
+                            .postEntity(postEntity)
+                            .createdAt(LocalDateTime.now()).build()
+            );
+            isSuccess = true;
+        } catch (Exception e) {
             throw new AppException(ErrorCode.NOT_ACCEPT_SAVE,ErrorCode.NOT_ACCEPT_SAVE.getMessage());
         }
         return isSuccess;
